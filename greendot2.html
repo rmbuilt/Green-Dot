@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Green Dot · dark green & white</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #e5f0ea;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        /* main container */
+        .phone {
+            width: 100%;
+            max-width: 440px;
+            background: #ffffff;
+            border-radius: 48px;
+            box-shadow: 0 30px 60px -15px #1d5e47, 0 0 0 2px #c0e6d4 inset;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #b8ebd2;
+        }
+
+        .screen {
+            padding: 24px 20px 20px;
+            background: white;
+        }
+
+        .hidden { display: none !important; }
+
+        /* processing overlay */
+        .processing-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .processing-card {
+            background: white;
+            border-radius: 48px;
+            padding: 36px 32px;
+            text-align: center;
+            max-width: 360px;
+            border: 3px solid #006747;
+            box-shadow: 0 30px 40px -15px #2f6b55;
+        }
+        .spinner {
+            width: 70px; height: 70px;
+            border: 8px solid #d0f0e0;
+            border-top: 8px solid #006747;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* login page */
+        .login-header { text-align: center; margin-bottom: 32px; }
+        .logo {
+            color: #006747; font-size: 3rem; font-weight: 700;
+            letter-spacing: -1px; text-shadow: 0 4px 8px #b0efd0;
+        }
+        .logo span { color: #1e4a3d; font-weight: 300; }
+        .login-box {
+            background: #f5fcf8; border-radius: 42px; padding: 28px 22px;
+            border: 2px solid #c0e6d4; box-shadow: 0 20px 30px -10px #a0cfbb;
+        }
+        .field { margin-bottom: 24px; }
+        .field label {
+            display: block; color: #006747; font-weight: 600; margin-bottom: 8px;
+        }
+        .field input {
+            width: 100%; background: white; border: 2px solid #c0e6d4;
+            border-radius: 60px; padding: 18px 22px; font-size: 1rem;
+            color: #154e3b; outline: none;
+        }
+        .field input:focus { border-color: #006747; box-shadow: 0 0 0 4px #d0f5e5; }
+        .login-error {
+            background: #ffefed; border-left: 8px solid #ff5a5a;
+            color: #b12a2a; padding: 16px 20px; border-radius: 40px;
+            margin: 16px 0 22px; display: flex; align-items: center; gap: 10px;
+        }
+        .btn {
+            background: #006747; border: none; border-radius: 60px;
+            padding: 20px 32px; font-size: 1.4rem; font-weight: 700; color: white;
+            width: 100%; box-shadow: 0 8px 0 #004d36; cursor: pointer;
+            transition: 0.1s;
+        }
+        .btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #004d36; }
+
+        /* dashboard (home) */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px; color: #1e4a3d; font-weight: 500;
+        }
+        .live-clock {
+            background: #ecfcf4; padding: 6px 18px; border-radius: 40px;
+            border: 2px solid #c0e6d4; font-size: 1.1rem;
+        }
+        .secure-badge { display: flex; align-items: center; gap: 6px; color: #006747; }
+
+        .payroll-card {
+            background: white; border-radius: 32px; padding: 28px 24px;
+            border: 3px solid #c0e6d4; box-shadow: 0 25px 30px -10px #a0cfbb;
+            margin-bottom: 24px;
+        }
+        .payroll-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px;
+        }
+        .payroll-header h2 { color: #006747; font-size: 1.6rem; font-weight: 600; }
+        .badge {
+            background: #006747; color: white; padding: 10px 20px;
+            border-radius: 40px; font-weight: 700;
+        }
+        .balance-large {
+            font-size: 3.2rem; font-weight: 800; color: #1e4a3d;
+            margin-bottom: 24px; letter-spacing: -1px;
+        }
+
+        .form-row { margin-bottom: 18px; }
+        .form-row label {
+            color: #006747; font-weight: 600; display: block; margin-bottom: 6px;
+        }
+        .form-row input, .form-row select {
+            width: 100%; background: white; border: 2px solid #c0e6d4;
+            border-radius: 60px; padding: 16px 22px; font-size: 1.1rem;
+            color: #154e3b; outline: none;
+        }
+        .form-row input:focus { border-color: #006747; }
+        .name-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .name-group .form-row { flex: 1 1 160px; }
+
+        .submit-btn {
+            background: #006747; border: none; border-radius: 60px; padding: 22px;
+            font-size: 1.6rem; font-weight: 700; color: white; width: 100%;
+            box-shadow: 0 8px 0 #004d36; cursor: pointer; margin-top: 24px;
+        }
+        .submit-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #004d36; }
+
+        /* bottom navigation */
+        .bottom-nav {
+            display: flex; justify-content: space-around; background: white;
+            border-top: 3px solid #d0f0e0; padding: 12px 0 8px;
+            border-radius: 40px 40px 0 0; box-shadow: 0 -4px 10px rgba(0,80,50,0.1);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: #5f8b7a; font-size: 0.9rem; font-weight: 500; cursor: pointer;
+            padding: 6px 16px; border-radius: 40px;
+        }
+        .nav-item i { font-size: 1.8rem; margin-bottom: 4px; }
+        .nav-item.active {
+            color: #006747; background: #e0ffee; font-weight: 600;
+        }
+
+        /* sections */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* receipt page (full) */
+        .receipt-container {
+            background: white; border-radius: 42px; padding: 28px 22px;
+            border: 3px solid #c0e6d4; box-shadow: 0 30px 40px -15px #8fc7ae;
+        }
+        .receipt-title { color: #006747; font-size: 2rem; font-weight: 700; margin-bottom: 12px; }
+        .success-message {
+            background: #e0ffee; border-left: 12px solid #006747; padding: 22px;
+            border-radius: 32px; font-size: 1.1rem; color: #1e4a3d; margin: 20px 0;
+            line-height: 1.5;
+        }
+        .receipt-detail {
+            background: #f5fcf8; border-radius: 28px; padding: 22px;
+            margin: 22px 0; border: 2px solid #c0f0d5;
+        }
+        .receipt-row {
+            display: flex; justify-content: space-between; padding: 14px 0;
+            border-bottom: 1px solid #c0e6d4;
+        }
+        .receipt-row:last-child { border-bottom: none; }
+        .approval-code {
+            background: #e6fff2; padding: 16px; border-radius: 30px;
+            font-family: monospace; font-size: 1.4rem; text-align: center;
+            letter-spacing: 3px; color: #006747; border: 2px dashed #006747;
+            margin: 24px 0;
+        }
+        .status-steps {
+            display: flex; justify-content: space-between; margin: 32px 0 16px;
+        }
+        .step { text-align: center; flex: 1; }
+        .step .circle {
+            width: 40px; height: 40px; background: #c0e6d4; border-radius: 30px;
+            margin: 0 auto 8px; display: flex; align-items: center;
+            justify-content: center; color: white; font-weight: 700;
+        }
+        .step.active .circle { background: #006747; box-shadow: 0 0 0 4px #d0f5e5; }
+        .step.active .label { color: #1e4a3d; font-weight: 600; }
+
+        .back-dashboard {
+            background: none; border: 3px solid #006747; border-radius: 60px;
+            padding: 16px 32px; font-size: 1.2rem; font-weight: 700;
+            color: #006747; width: 100%; cursor: pointer; margin-top: 20px;
+        }
+        .back-dashboard:active { background: #e0ffee; }
+
+        /* receipts list page */
+        .receipts-list {
+            background: white; border-radius: 32px; padding: 16px;
+            border: 2px solid #c0e6d4; margin: 20px 0;
+        }
+        .receipt-item {
+            background: #f5fcf8; border-radius: 24px; padding: 18px;
+            margin-bottom: 12px; display: flex; justify-content: space-between;
+            align-items: center; border: 2px solid #c0e6d4; cursor: pointer;
+        }
+        .receipt-item-left .date { color: #1e4a3d; font-weight: 600; }
+        .receipt-item-left .name { color: #006747; font-size: 1.2rem; }
+        .receipt-item-right { font-size: 1.4rem; font-weight: 700; color: #006747; }
+        .no-receipts { color: #5f8b7a; text-align: center; padding: 32px; }
+
+        .footer-note { text-align: center; color: #6aa690; font-size: 0.8rem; margin-top: 24px; }
+    </style>
+</head>
+<body>
+<div class="phone" id="app">
+
+    <!-- PROCESSING OVERLAY -->
+    <div id="processingOverlay" class="processing-overlay hidden">
+        <div class="processing-card">
+            <div class="spinner"></div>
+            <h3 style="color: #006747;">Processing your deposit</h3>
+            <p><strong>$<span id="processingAmount">250,000.00</span></strong></p>
+            <p>Recipient: <span id="processingName">James Hogsed</span><br>Method: Direct Deposit</p>
+            <p style="margin-top: 20px;">Status: <span style="color: #006747;">Processing</span></p>
+            <small>🔒 Secured by Green Dot Bank</small>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage">
+        <div class="screen">
+            <div class="login-header">
+                <div class="logo">green<span>dot</span></div>
+                <div style="color: #1e4a3d;">bank · secure access</div>
+            </div>
+            <div class="login-box">
+                <div class="field">
+                    <label>Name</label>
+                    <input type="text" id="loginName" placeholder="Your full name" value="Charles Watts">
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com" value="c.watts@example.com">
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••" value="">
+                    <div style="color: #006747; margin-top: 8px;">Use password: <strong>1221</strong></div>
+                </div>
+                <div id="loginError" class="login-error hidden">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 1.8rem;"></i> The password you entered is invalid.
+                </div>
+                <button class="btn" id="loginBtn">Access Account</button>
+                <div class="footer-note" style="margin-top: 20px;">Green Dot · NMLS #914924</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD (with bottom nav) -->
+    <div id="dashboardPage" class="hidden">
+        <div class="screen">
+            <!-- top bar with live clock -->
+            <div class="top-bar">
+                <span class="live-clock" id="liveClock"></span>
+                <span class="secure-badge"><i class="fas fa-lock"></i> Secure</span>
+            </div>
+
+            <!-- sections: home (deposit form), receipts list, receipt detail -->
+            <div id="homeSection" class="section active">
+                <!-- deposit form -->
+                <div class="payroll-card">
+                    <div class="payroll-header">
+                        <h2>Green Dot Payroll</h2>
+                        <span class="badge">Balance</span>
+                    </div>
+                    <div class="balance-large">$350,000.00</div>
+
+                    <div class="form-row">
+                        <label>Amount ($)</label>
+                        <input type="number" id="depositAmount" value="250000" step="1000" min="0">
+                    </div>
+
+                    <div class="name-group">
+                        <div class="form-row">
+                            <label>First Name</label>
+                            <input type="text" id="firstName" value="James" placeholder="Enter first name">
+                        </div>
+                        <div class="form-row">
+                            <label>Last Name</label>
+                            <input type="text" id="lastName" value="Hogsed" placeholder="Enter last name">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label>ZIP Code</label>
+                        <input type="text" id="zipCode" value="76308" placeholder="ZIP Code">
+                    </div>
+
+                    <div class="form-row">
+                        <label>Mobile Number</label>
+                        <input type="tel" id="mobile" value="(940) 555-1234" placeholder="(000) 000-0000">
+                    </div>
+
+                    <div class="form-row">
+                        <label>Email</label>
+                        <input type="email" id="depositEmail" value="james.hogsed@example.com" placeholder="Enter your email address">
+                    </div>
+
+                    <button class="submit-btn" id="submitDepositBtn">Submit to Deposit</button>
+                </div>
+                <div class="footer-note">
+                    <i class="fas fa-shield-alt"></i> Funds held at Green Dot Bank
+                </div>
+            </div>
+
+            <!-- RECEIPTS LIST SECTION -->
+            <div id="receiptsListSection" class="section">
+                <h2 style="color: #006747; margin: 12px 0;">Your Receipts</h2>
+                <div id="receiptsListContainer" class="receipts-list">
+                    <!-- dynamic list from localStorage -->
+                </div>
+                <button class="back-dashboard" id="backFromReceiptsBtn">← Back to Home</button>
+            </div>
+
+            <!-- FULL RECEIPT DETAIL SECTION (when a receipt is clicked) -->
+            <div id="receiptDetailSection" class="section">
+                <div id="fullReceiptContainer"></div>
+                <button class="back-dashboard" id="backFromDetailBtn">← Back to Receipts</button>
+            </div>
+
+            <!-- bottom navigation -->
+            <div class="bottom-nav">
+                <div class="nav-item active" id="navHome"><i class="fas fa-home"></i><span>Home</span></div>
+                <div class="nav-item" id="navReceipts"><i class="fas fa-receipt"></i><span>Receipts</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- elements -----
+        const loginPage = document.getElementById('loginPage');
+        const dashboardPage = document.getElementById('dashboardPage');
+        const processingOverlay = document.getElementById('processingOverlay');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const loginNameInput = document.getElementById('loginName');
+
+        // deposit form
+        const depositAmount = document.getElementById('depositAmount');
+        const firstName = document.getElementById('firstName');
+        const lastName = document.getElementById('lastName');
+        const zipCode = document.getElementById('zipCode');
+        const mobile = document.getElementById('mobile');
+        const depositEmail = document.getElementById('depositEmail');
+        const submitBtn = document.getElementById('submitDepositBtn');
+
+        // processing fields
+        const processingAmount = document.getElementById('processingAmount');
+        const processingName = document.getElementById('processingName');
+
+        // navigation
+        const navHome = document.getElementById('navHome');
+        const navReceipts = document.getElementById('navReceipts');
+        const homeSection = document.getElementById('homeSection');
+        const receiptsListSection = document.getElementById('receiptsListSection');
+        const receiptDetailSection = document.getElementById('receiptDetailSection');
+        const backFromReceipts = document.getElementById('backFromReceiptsBtn');
+        const backFromDetail = document.getElementById('backFromDetailBtn');
+        const receiptsListContainer = document.getElementById('receiptsListContainer');
+        const fullReceiptContainer = document.getElementById('fullReceiptContainer');
+
+        // live clock
+        const liveClock = document.getElementById('liveClock');
+
+        // ----- live clock update -----
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            liveClock.innerText = `${hours}:${minutes}:${seconds} ${dateStr}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ----- localStorage receipts -----
+        let receipts = JSON.parse(localStorage.getItem('greenDotReceipts')) || [];
+
+        function saveReceipts() {
+            localStorage.setItem('greenDotReceipts', JSON.stringify(receipts));
+        }
+
+        function addReceipt(receipt) {
+            receipts.unshift(receipt); // newest first
+            saveReceipts();
+        }
+
+        function formatMoney(value) {
+            let num = Number(value).toFixed(2);
+            return num.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        function renderReceiptsList() {
+            if (receipts.length === 0) {
+                receiptsListContainer.innerHTML = '<div class="no-receipts">No receipts yet. Make a deposit.</div>';
+                return;
+            }
+            let html = '';
+            receipts.forEach((r, index) => {
+                html += `
+                    <div class="receipt-item" data-index="${index}">
+                        <div class="receipt-item-left">
+                            <div class="date">${r.dateTime}</div>
+                            <div class="name">${r.fullName}</div>
+                        </div>
+                        <div class="receipt-item-right">$${formatMoney(r.amount)}</div>
+                    </div>
+                `;
+            });
+            receiptsListContainer.innerHTML = html;
+            // attach click events
+            document.querySelectorAll('.receipt-item').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const index = el.dataset.index;
+                    showReceiptDetail(receipts[index]);
+                });
+            });
+        }
+
+        function showReceiptDetail(receipt) {
+            // build full receipt HTML
+            const html = `
+                <div class="receipt-container">
+                    <div class="receipt-title">✅ Transaction Successful</div>
+                    <div class="success-message">
+                        Great news! A reloadable account has been created and $${formatMoney(receipt.amount)} has been deposited. He/She will receive our notification for the confirmation email before we send the login details and add the card with it.
+                    </div>
+                    <h3 style="color: #006747; margin: 20px 0 12px;">Deposit Confirmation</h3>
+                    <div class="receipt-detail">
+                        <div class="receipt-row"><span>Depositor Name:</span> <strong>${receipt.fullName}</strong></div>
+                        <div class="receipt-row"><span>Deposit Amount:</span> <strong>$${formatMoney(receipt.amount)}</strong></div>
+                        <div class="receipt-row"><span>Deposit Method:</span> Green Dot Direct Deposit</div>
+                        <div class="receipt-row"><span>Reference Number:</span> ${receipt.reference}</div>
+                        <div class="receipt-row"><span>Date & Time:</span> ${receipt.dateTime}</div>
+                        <div class="receipt-row"><span>Status:</span> <span style="color: #006747;">Completed Successfully</span></div>
+                        <div class="receipt-row"><span>Fee:</span> $0.00</div>
+                        <div class="receipt-row"><span>Total Deposited:</span> <strong>$${formatMoney(receipt.amount)}</strong></div>
+                    </div>
+                    <div class="approval-code">${receipt.approval}</div>
+                    <p style="color: #1e4a3d;">An email confirmation has been sent to your registered address with full transaction details and your approval number.</p>
+                    <div class="status-steps">
+                        <div class="step active"><div class="circle"><i class="fas fa-check"></i></div><span class="label">Request Submitted</span></div>
+                        <div class="step active"><div class="circle"><i class="fas fa-check"></i></div><span class="label">Available Verification</span></div>
+                        <div class="step active"><div class="circle"><i class="fas fa-check"></i></div><span class="label">Funds Credited</span></div>
+                    </div>
+                </div>
+            `;
+            fullReceiptContainer.innerHTML = html;
+            // switch to detail section
+            homeSection.classList.remove('active');
+            receiptsListSection.classList.remove('active');
+            receiptDetailSection.classList.add('active');
+            navHome.classList.remove('active');
+            navReceipts.classList.remove('active');
+        }
+
+        // ----- login -----
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pwd = loginPassword.value.trim();
+            if (pwd === '1221') {
+                loginPage.classList.add('hidden');
+                dashboardPage.classList.remove('hidden');
+                loginError.classList.add('hidden');
+                // prefill name from login
+                const fullName = loginNameInput.value.trim();
+                if (fullName.includes(' ')) {
+                    let parts = fullName.split(' ');
+                    firstName.value = parts[0];
+                    lastName.value = parts.slice(1).join(' ') || 'Watts';
+                } else {
+                    firstName.value = fullName;
+                    lastName.value = 'Watts';
+                }
+                renderReceiptsList();
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // ----- deposit submit -----
+        submitBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            let amount = depositAmount.value.replace(/,/g, '');
+            if (!amount || isNaN(amount) || Number(amount) <= 0) amount = 250000;
+            let fname = firstName.value.trim() || 'James';
+            let lname = lastName.value.trim() || 'Hogsed';
+            let fullName = fname + ' ' + lname;
+
+            // show processing
+            processingAmount.innerText = formatMoney(amount);
+            processingName.innerText = fullName;
+            processingOverlay.classList.remove('hidden');
+            dashboardPage.classList.add('hidden'); // hide dashboard
+
+            // simulate processing
+            setTimeout(() => {
+                processingOverlay.classList.add('hidden');
+                dashboardPage.classList.remove('hidden');
+
+                // create receipt
+                const now = new Date();
+                const dateTime = now.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const reference = 'GDL' + Math.random().toString(36).substring(2,10).toUpperCase();
+                const approval = 'GD' + Math.random().toString(36).substring(2,10).toUpperCase() + 'E9';
+                const newReceipt = {
+                    amount: amount,
+                    fullName: fullName,
+                    reference: reference,
+                    approval: approval,
+                    dateTime: dateTime,
+                };
+                addReceipt(newReceipt);
+                renderReceiptsList();
+
+                // show the receipt detail immediately
+                showReceiptDetail(newReceipt);
+            }, 3000);
+        });
+
+        // ----- navigation -----
+        navHome.addEventListener('click', () => {
+            homeSection.classList.add('active');
+            receiptsListSection.classList.remove('active');
+            receiptDetailSection.classList.remove('active');
+            navHome.classList.add('active');
+            navReceipts.classList.remove('active');
+        });
+
+        navReceipts.addEventListener('click', () => {
+            homeSection.classList.remove('active');
+            receiptsListSection.classList.add('active');
+            receiptDetailSection.classList.remove('active');
+            navHome.classList.remove('active');
+            navReceipts.classList.add('active');
+            renderReceiptsList(); // refresh
+        });
+
+        backFromReceipts.addEventListener('click', () => {
+            navHome.click();
+        });
+
+        backFromDetail.addEventListener('click', () => {
+            receiptsListSection.classList.add('active');
+            receiptDetailSection.classList.remove('active');
+            navReceipts.click(); // activate receipts nav
+        });
+
+        // prefill form defaults
+        depositAmount.value = 250000;
+        zipCode.value = '76308';
+        mobile.value = '(940) 555-1234';
+        depositEmail.value = 'james.hogsed@example.com';
+    })();
+</script>
+</body>
+</html>
